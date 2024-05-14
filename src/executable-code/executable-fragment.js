@@ -27,7 +27,20 @@ const LANGUAGE_MODE = {
 };
 
 const LANGUAGE_OPTIONS = {
-  TypeScript: { "just-types": true },
+  TypeScript: {
+  "just-types": false,
+  "nice-property-names": false,
+  "explicit-unions": true, 
+  "runtime-typecheck": true, 
+  "runtime-typecheck-ignore-unknown-properties": false, 
+  "acronym-style": "original", 
+    "converters": "all-objects", 
+    "raw-type": "any", 
+    "prefer-unions": true, 
+    "prefer-types": false, 
+    "prefer-const-values": false, 
+    "readonly": false 
+  },
   Ruby: { "just-types": true },
   Elm: { "just-types": true },
   Go: { "just-types": true },
