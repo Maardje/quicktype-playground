@@ -25,22 +25,33 @@ const LANGUAGE_MODE = {
   Kotlin: "text/x-kotlin",
   Rust: "text/x-c"
 };
-
-const LANGUAGE_OPTIONS = {
-  TypeScript: {
-  "just-types": false,
-  "nice-property-names": false,
-  "explicit-unions": true, 
-  "runtime-typecheck": true, 
-  "runtime-typecheck-ignore-unknown-properties": false, 
-  "acronym-style": "original", 
-    "converters": "all-objects", 
-    "raw-type": "any", 
-    "prefer-unions": true, 
-    "prefer-types": false, 
-    "prefer-const-values": false, 
-    "readonly": false 
+const options = {
+  inferMaps: true,
+  inferEnums: true,
+  inferUuids: true,
+  inferDateTimes: true,
+  inferIntegerStrings: true,
+  inferBooleanStrings: true,
+  combineClasses: true,
+  ignoreJsonRefs: true,
+  allPropertiesOptional: false,
+  rendererOptions: {
+    "just-types": false,
+    "nice-property-names": false,
+    "explicit-unions": true,
+    "runtime-typecheck": true,
+    "runtime-typecheck-ignore-unknown-properties": false,
+    "acronym-style": "original",
+    converters: "all-objects",
+    "raw-type": "any",
+    "prefer-unions": true,
+    "prefer-types": false,
+    "prefer-const-values": false,
+    readonly: false,
   },
+};
+const LANGUAGE_OPTIONS = {
+  TypeScript: {"just-types": true},
   Ruby: { "just-types": true },
   Elm: { "just-types": true },
   Go: { "just-types": true },
@@ -86,7 +97,8 @@ export default class ExecutableFragment extends ExecutableCodeTemplate {
     if (this.state.language === "JSON") {
       this.codemirror.setValue(json);
     } else {
-      quicktype({
+      if(this.state.language === "TypeScript") {
+        quicktype({
         lang: this.state.language,
         sources: [
           {
@@ -95,10 +107,25 @@ export default class ExecutableFragment extends ExecutableCodeTemplate {
             samples: [json]
           }
         ],
-        rendererOptions: LANGUAGE_OPTIONS[this.state.language]
+        ...options
       }).then(result => {
         this.codemirror.setValue(result.lines.join("\n").trim());
       });
+      } else {
+        quicktype({
+          lang: this.state.language,
+          sources: [
+            {
+              kind: "json",
+              name: this.state.topLevelName || "TopLevel",
+              samples: [json]
+            }
+          ],
+          rendererOptions: LANGUAGE_OPTIONS[this.state.language]
+        }).then(result => {
+          this.codemirror.setValue(result.lines.join("\n").trim());
+        });
+      }
     }
   }
 
